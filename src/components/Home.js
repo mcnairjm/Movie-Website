@@ -1,21 +1,45 @@
-import React, { useState } from 'react';
+import React from 'react';
 import SearchBar from './SearchBar';
-import MovieCard from './MovieCard';
 
-function Home() {
-  const [selectedMovie, setSelectedMovie] = useState(null);
-
+function Home({ setSelectedMovie }) {
   return (
-    <div>
+    <div style={{ textAlign: 'center' }}>
+      <h1 style={{ fontFamily: 'Bangers, cursive', fontSize: '4rem', margin: '20px 0' }}>McNair's Movies</h1>
       <SearchBar setSelectedMovie={setSelectedMovie} />
-      {selectedMovie && (
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-          <MovieCard movie={selectedMovie} />
-        </div>
-      )}
     </div>
   );
 }
 
 export default Home;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

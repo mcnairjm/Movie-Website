@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { startofMonth, endOfMonth, eachDayOfInterval, format, addMonths, subMonths } from 'date-fns';
+import { startOfMonth, endOfMonth, eachDayOfInterval, format, addMonths, subMonths } from 'date-fns';
 
 function ReleaseCalendar() {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [days, setDays] = useState([]);
 
     useEffect(() => {
-        const start = startofMonth(currentDate);
+        const start = startOfMonth(currentDate);
         const end = endOfMonth(currentDate);
         setDays(eachDayOfInterval({ start, end }));
     }, [currentDate]);
