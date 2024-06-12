@@ -57,8 +57,7 @@ function MovieCard({ movie }) {
           padding: '20px',
           boxSizing: 'border-box',
           display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between'
+          flexDirection: 'column'
         }}>
           <div style={{
             position: 'absolute',
@@ -84,7 +83,7 @@ function MovieCard({ movie }) {
               style={{ fontSize: '36px', cursor: 'pointer', color: isInWatchlist ? 'green' : 'black' }}
             />
           </div>
-          <div style={{ paddingTop: '70px' }}>
+          <div style={{ paddingTop: '70px', flexGrow: 1, overflowY: 'auto', marginTop: '50px' }}> {/* Adjusted padding and added overflowY */}
             <h2 style={{ fontSize: '28px', margin: '0' }}>{movie.Title} <span style={{ fontSize: '22px', fontWeight: 'normal' }}>({movie.Year})</span></h2>
             <div style={{ marginTop: '5px' }}>
               <p style={{ fontSize: '14px', border: '1px solid black', display: 'inline-block', padding: '2px 4px', marginRight: '10px' }}>{movie.Rated}</p>
@@ -105,6 +104,10 @@ function MovieCard({ movie }) {
 }
 
 export default MovieCard;
+
+
+
+
 
 
 
