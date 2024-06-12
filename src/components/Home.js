@@ -2,23 +2,24 @@ import React from 'react';
 import SearchBar from './SearchBar';
 
 function Home({ setSelectedMovie }) {
+  const generateRandomImdbId = () => {
+    const randomId = Math.floor(Math.random() * 9000000) + 1000000; // Generates a random 7-digit number
+    return `tt${randomId}`;
+  };
+
   const handleRandomPick = () => {
-    const randomMovies = [
-      "tt0111161", // The Shawshank Redemption
-      "tt0068646", // The Godfather
-      "tt0468569", // The Dark Knight
-      "tt0071562", // The Godfather: Part II
-      "tt0108052", // Schindler's List
-      "tt0050083", // 12 Angry Men
-      // Add more movie IDs here...
-    ];
-    const randomId = randomMovies[Math.floor(Math.random() * randomMovies.length)];
-    
-    fetch(`https://www.omdbapi.com/?apikey=987ac659&i=${randomId}&plot=full`)
+    const randomImdbId = generateRandomImdbId();
+
+    fetch(`https://www.omdbapi.com/?apikey=987ac659&i=${randomImdbId}&plot=full`)
       .then(response => response.json())
-      .then(data => {
-        setSelectedMovie(data);
-      });
+      .then(movieData => {
+        if (movieData && movieData.Response === "True") {
+          setSelectedMovie(movieData);
+        } else {
+          handleRandomPick(); // Retry if no valid movie is found
+        }
+      })
+      .catch(() => handleRandomPick()); // Retry on fetch error
   };
 
   return (
