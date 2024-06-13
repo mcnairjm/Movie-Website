@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 function Watchlist({ watchlist, setSelectedMovie }) {
     const [sortedWatchlist, setSortedWatchlist] = useState([]);
     const [sortOption, setSortOption] = useState('');
     const [activeTab, setActiveTab] = useState('watchlist');
+    const scrollContentRef = useRef(null);
 
     useEffect(() => {
         setSortedWatchlist(watchlist);
@@ -12,7 +13,7 @@ function Watchlist({ watchlist, setSelectedMovie }) {
     const handleSort = (option) => {
         setSortOption(option);
         let sorted = [...watchlist];
-        
+
         switch (option) {
             case 'a-z':
                 sorted.sort((a, b) => a.Title.localeCompare(b.Title));
@@ -60,17 +61,33 @@ function Watchlist({ watchlist, setSelectedMovie }) {
         setSelectedMovie(data);
     };
 
+    useEffect(() => {
+        const scrollContent = scrollContentRef.current;
+        if (scrollContent) {
+            const handleAnimationIteration = () => {
+                scrollContent.style.animation = 'none';
+                requestAnimationFrame(() => {
+                    scrollContent.style.animation = '';
+                });
+            };
+            scrollContent.addEventListener('animationiteration', handleAnimationIteration);
+            return () => {
+                scrollContent.removeEventListener('animationiteration', handleAnimationIteration);
+            };
+        }
+    }, [sortedWatchlist]);
+
     return (
         <div>
             <div className="tab-container">
-                <button 
-                    className={`tab ${activeTab === 'watchlist' ? 'active' : ''}`} 
+                <button
+                    className={`tab ${activeTab === 'watchlist' ? 'active' : ''}`}
                     onClick={() => handleTabChange('watchlist')}
                 >
                     Watchlist
                 </button>
-                <button 
-                    className={`tab ${activeTab === 'random' ? 'active' : ''}`} 
+                <button
+                    className={`tab ${activeTab === 'random' ? 'active' : ''}`}
                     onClick={() => handleTabChange('random')}
                 >
                     Random Pick!
@@ -115,37 +132,38 @@ function Watchlist({ watchlist, setSelectedMovie }) {
                 </div>
             )}
             {activeTab === 'random' && (
-                <div>
+                <div className="random-container">
                     <div className="scroll-container">
-                        <div className="scroll-content">
+                        <div className="scroll-content" ref={scrollContentRef}>
                             {sortedWatchlist.concat(sortedWatchlist).map((movie, index) => (
-                                <div key={index} style={{ display: 'inline-block', margin: '10px' }}>
+                                <div key={index} className="movie-frame">
                                     <img src={movie.Poster} alt={movie.Title} style={{ width: '100px', height: '150px' }} />
+                                    <div className="squares-container top">
+                                        {[...Array(3)].map((_, idx) => (
+                                            <div key={idx} className="square"></div>
+                                        ))}
+                                    </div>
+                                    <div className="squares-container bottom">
+                                        {[...Array(3)].map((_, idx) => (
+                                            <div key={idx} className="square"></div>
+                                        ))}
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     </div>
-                    <button onClick={handleRandomPick} style={{
-                        marginTop: '20px',
-                        padding: '10px 20px',
-                        fontSize: '24px',
-                        fontFamily: 'Luckiest Guy, cursive',
-                        backgroundColor: '#ff6347',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '10px',
-                        cursor: 'pointer',
-                        transition: 'transform 0.2s',
-                    }}>
-                        Pick a Movie
-                    </button>
+                    <div className="random-button-container">
+                        <button onClick={handleRandomPick} className="random-button">
+                            Pick a Movie
+                        </button>
+                    </div>
                 </div>
             )}
             <style>
                 {`
                     .tab-container {
                         display: flex;
-                        justify-content: center;
+                        justify-content: flex-start; /* Align tabs to the left */
                         margin-top: 20px;
                     }
                     .tab {
@@ -170,12 +188,15 @@ function Watchlist({ watchlist, setSelectedMovie }) {
                     }
                     .scroll-container {
                         overflow: hidden;
-                        white-space: nowrap;
                         width: 100%;
+                        background-color: black;
+                        padding: 20px 0;
+                        position: relative;
                     }
                     .scroll-content {
-                        display: inline-block;
+                        display: flex;
                         animation: scroll 20s linear infinite;
+                        width: max-content; /* Ensure it adjusts to the content width */
                     }
                     @keyframes scroll {
                         0% {
@@ -184,6 +205,54 @@ function Watchlist({ watchlist, setSelectedMovie }) {
                         100% {
                             transform: translateX(-50%);
                         }
+                    }
+                    .movie-frame {
+                        display: inline-block;
+                        margin: 10px;
+                        padding: 10px;
+                        background-color: black;
+                        border: 2px solid black;
+                        position: relative;
+                    }
+                    .squares-container {
+                        display: flex;
+                        justify-content: space-around;
+                        position: absolute;
+                        width: 100%;
+                    }
+                    .squares-container.top {
+                        top: -12px;
+                    }
+                    .squares-container.bottom {
+                        bottom: -12px;
+                    }
+                    .square {
+                        width: 10px;
+                        height: 10px;
+                        background-color: white;
+                    }
+                    .random-container {
+                        text-align: left; /* Align button to the left */
+                        padding-left: 20px; /* Add padding to separate from the edge */
+                    }
+                    .random-button-container {
+                        display: flex;
+                        justify-content: flex-start; /* Align button to the left */
+                        margin-top: 20px;
+                    }
+                    .random-button {
+                        padding: 10px 20px;
+                        font-size: 24px;
+                        font-family: 'Luckiest Guy', cursive;
+                        background-color: #ff6347;
+                        color: #fff;
+                        border: none;
+                        border-radius: 10px;
+                        cursor: pointer;
+                        transition: transform 0.2s;
+                    }
+                    .random-button:hover {
+                        transform: scale(1.1);
                     }
                 `}
             </style>
