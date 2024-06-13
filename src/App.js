@@ -11,6 +11,7 @@ function App() {
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [favorites, setFavorites] = useState([]); // Add this line to manage favorites
   const cardRef = useRef(null);
 
   useEffect(() => {
@@ -36,6 +37,16 @@ function App() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const addToFavorites = (movie) => {
+    setFavorites(prevFavorites => {
+      if (prevFavorites.some(fav => fav.imdbID === movie.imdbID)) {
+        return prevFavorites.filter(fav => fav.imdbID !== movie.imdbID); // Remove if already in favorites
+      } else {
+        return [...prevFavorites, movie];
+      }
+    });
+  };
+
   return (
     <Router>
       <div style={{ display: 'flex' }}>
@@ -53,8 +64,11 @@ function App() {
             <Route path="/" element={<Home setSelectedMovie={(movie) => {
               setSelectedMovie(movie);
               setOverlayVisible(true);
+            }} addToFavorites={addToFavorites} favorites={favorites} />} />
+            <Route path="/favorites" element={<FavoriteMovies favorites={favorites} setSelectedMovie={(movie) => {
+              setSelectedMovie(movie);
+              setOverlayVisible(true);
             }} />} />
-            <Route path="/favorites" element={<FavoriteMovies />} />
             <Route path="/watchlist" element={<Watchlist />} />
             <Route path="/calendar" element={<ReleaseCalendar />} />
           </Routes>
@@ -80,7 +94,7 @@ function App() {
       {selectedMovie && (
         <div style={{ display: 'flex', justifyContent: 'center', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 3 }}>
           <div ref={cardRef}>
-            <MovieCard movie={selectedMovie} />
+            <MovieCard movie={selectedMovie} addToFavorites={addToFavorites} favorites={favorites} />
           </div>
         </div>
       )}
@@ -89,6 +103,9 @@ function App() {
 }
 
 export default App;
+
+
+
 
 
 

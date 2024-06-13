@@ -3,11 +3,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart as solidHeart, faPlus as solidPlus } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as outlineHeart, faSquare as outlineSquare } from '@fortawesome/free-regular-svg-icons';
 
-function MovieCard({ movie }) {
+function MovieCard({ movie, addToFavorites, favorites }) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [showPlot, setShowPlot] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [isInWatchlist, setIsInWatchlist] = useState(false);
+  const [isInWatchlist, setIsInWatchlist] = useState(false); // Manage watchlist state
 
   const handleFlip = () => {
     setIsFlipped(!isFlipped);
@@ -19,15 +18,12 @@ function MovieCard({ movie }) {
     setShowPlot(!showPlot);
   };
 
-  const toggleFavorite = (e) => {
-    e.stopPropagation(); // Prevent flipping the card when clicking the button
-    setIsFavorite(!isFavorite);
-  };
-
   const toggleWatchlist = (e) => {
     e.stopPropagation(); // Prevent flipping the card when clicking the button
     setIsInWatchlist(!isInWatchlist);
   };
+
+  const isFavorite = favorites.some(fav => fav.imdbID === movie.imdbID);
 
   return (
     <div onClick={handleFlip} style={{ width: '400px', height: '600px', perspective: '1000px', cursor: 'pointer' }}>
@@ -57,7 +53,8 @@ function MovieCard({ movie }) {
           padding: '20px',
           boxSizing: 'border-box',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          justifyContent: 'space-between'
         }}>
           <div style={{
             position: 'absolute',
@@ -74,7 +71,10 @@ function MovieCard({ movie }) {
           <div style={{ position: 'absolute', top: '10px', right: '10px', left: '10px', display: 'flex', justifyContent: 'space-between' }}>
             <FontAwesomeIcon
               icon={isFavorite ? solidHeart : outlineHeart}
-              onClick={toggleFavorite}
+              onClick={(e) => {
+                e.stopPropagation();
+                addToFavorites(movie);
+              }}
               style={{ fontSize: '36px', cursor: 'pointer', color: isFavorite ? 'red' : 'black' }}
             />
             <FontAwesomeIcon
@@ -83,7 +83,7 @@ function MovieCard({ movie }) {
               style={{ fontSize: '36px', cursor: 'pointer', color: isInWatchlist ? 'green' : 'black' }}
             />
           </div>
-          <div style={{ paddingTop: '70px', flexGrow: 1, overflowY: 'auto', marginTop: '50px' }}> {/* Adjusted padding and added overflowY */}
+          <div style={{ paddingTop: '70px', flexGrow: 1, overflowY: 'auto', marginTop: '50px' }}>
             <h2 style={{ fontSize: '28px', margin: '0' }}>{movie.Title} <span style={{ fontSize: '22px', fontWeight: 'normal' }}>({movie.Year})</span></h2>
             <div style={{ marginTop: '5px' }}>
               <p style={{ fontSize: '14px', border: '1px solid black', display: 'inline-block', padding: '2px 4px', marginRight: '10px' }}>{movie.Rated}</p>
@@ -104,6 +104,11 @@ function MovieCard({ movie }) {
 }
 
 export default MovieCard;
+
+
+
+
+
 
 
 
