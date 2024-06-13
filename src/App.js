@@ -11,7 +11,8 @@ function App() {
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [favorites, setFavorites] = useState([]); // Add this line to manage favorites
+  const [favorites, setFavorites] = useState([]);
+  const [watchlist, setWatchlist] = useState([]); // Add this line to manage the watchlist
   const cardRef = useRef(null);
 
   useEffect(() => {
@@ -47,6 +48,16 @@ function App() {
     });
   };
 
+  const addToWatchlist = (movie) => {
+    setWatchlist(prevWatchlist => {
+      if (prevWatchlist.some(watch => watch.imdbID === movie.imdbID)) {
+        return prevWatchlist.filter(watch => watch.imdbID !== movie.imdbID); // Remove if already in watchlist
+      } else {
+        return [...prevWatchlist, movie];
+      }
+    });
+  };
+
   return (
     <Router>
       <div style={{ display: 'flex' }}>
@@ -64,12 +75,15 @@ function App() {
             <Route path="/" element={<Home setSelectedMovie={(movie) => {
               setSelectedMovie(movie);
               setOverlayVisible(true);
-            }} addToFavorites={addToFavorites} favorites={favorites} />} />
+            }} addToFavorites={addToFavorites} favorites={favorites} addToWatchlist={addToWatchlist} watchlist={watchlist} />} />
             <Route path="/favorites" element={<FavoriteMovies favorites={favorites} setSelectedMovie={(movie) => {
               setSelectedMovie(movie);
               setOverlayVisible(true);
             }} />} />
-            <Route path="/watchlist" element={<Watchlist />} />
+            <Route path="/watchlist" element={<Watchlist watchlist={watchlist} setSelectedMovie={(movie) => {
+              setSelectedMovie(movie);
+              setOverlayVisible(true);
+            }} />} />
             <Route path="/calendar" element={<ReleaseCalendar />} />
           </Routes>
         </div>
@@ -94,7 +108,7 @@ function App() {
       {selectedMovie && (
         <div style={{ display: 'flex', justifyContent: 'center', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 3 }}>
           <div ref={cardRef}>
-            <MovieCard movie={selectedMovie} addToFavorites={addToFavorites} favorites={favorites} />
+            <MovieCard movie={selectedMovie} addToFavorites={addToFavorites} favorites={favorites} addToWatchlist={addToWatchlist} watchlist={watchlist} />
           </div>
         </div>
       )}

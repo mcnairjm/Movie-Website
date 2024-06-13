@@ -3,10 +3,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart as solidHeart, faPlus as solidPlus } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as outlineHeart, faSquare as outlineSquare } from '@fortawesome/free-regular-svg-icons';
 
-function MovieCard({ movie, addToFavorites, favorites }) {
+function MovieCard({ movie, addToFavorites, favorites, addToWatchlist, watchlist }) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [showPlot, setShowPlot] = useState(false);
-  const [isInWatchlist, setIsInWatchlist] = useState(false); // Manage watchlist state
 
   const handleFlip = () => {
     setIsFlipped(!isFlipped);
@@ -18,12 +17,8 @@ function MovieCard({ movie, addToFavorites, favorites }) {
     setShowPlot(!showPlot);
   };
 
-  const toggleWatchlist = (e) => {
-    e.stopPropagation(); // Prevent flipping the card when clicking the button
-    setIsInWatchlist(!isInWatchlist);
-  };
-
   const isFavorite = favorites.some(fav => fav.imdbID === movie.imdbID);
+  const isInWatchlist = watchlist.some(watch => watch.imdbID === movie.imdbID);
 
   return (
     <div onClick={handleFlip} style={{ width: '400px', height: '600px', perspective: '1000px', cursor: 'pointer' }}>
@@ -79,7 +74,10 @@ function MovieCard({ movie, addToFavorites, favorites }) {
             />
             <FontAwesomeIcon
               icon={isInWatchlist ? solidPlus : outlineSquare}
-              onClick={toggleWatchlist}
+              onClick={(e) => {
+                e.stopPropagation();
+                addToWatchlist(movie);
+              }}
               style={{ fontSize: '36px', cursor: 'pointer', color: isInWatchlist ? 'green' : 'black' }}
             />
           </div>
@@ -104,6 +102,7 @@ function MovieCard({ movie, addToFavorites, favorites }) {
 }
 
 export default MovieCard;
+
 
 
 
