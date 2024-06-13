@@ -12,7 +12,7 @@ function App() {
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [favorites, setFavorites] = useState([]);
-  const [watchlist, setWatchlist] = useState([]); // Add this line to manage the watchlist
+  const [watchlist, setWatchlist] = useState([]);
   const cardRef = useRef(null);
 
   useEffect(() => {
@@ -41,9 +41,9 @@ function App() {
   const addToFavorites = (movie) => {
     setFavorites(prevFavorites => {
       if (prevFavorites.some(fav => fav.imdbID === movie.imdbID)) {
-        return prevFavorites.filter(fav => fav.imdbID !== movie.imdbID); // Remove if already in favorites
+        return prevFavorites.filter(fav => fav.imdbID !== movie.imdbID);
       } else {
-        return [...prevFavorites, movie];
+        return [...prevFavorites, { ...movie, addedAt: Date.now() }];
       }
     });
   };
@@ -51,7 +51,7 @@ function App() {
   const addToWatchlist = (movie) => {
     setWatchlist(prevWatchlist => {
       if (prevWatchlist.some(watch => watch.imdbID === movie.imdbID)) {
-        return prevWatchlist.filter(watch => watch.imdbID !== movie.imdbID); // Remove if already in watchlist
+        return prevWatchlist.filter(watch => watch.imdbID !== movie.imdbID);
       } else {
         return [...prevWatchlist, movie];
       }
@@ -117,6 +117,7 @@ function App() {
 }
 
 export default App;
+
 
 
 

@@ -1,12 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function FavoriteMovies({ favorites, setSelectedMovie }) {
+    const [sortedFavorites, setSortedFavorites] = useState([]);
     const [sortOption, setSortOption] = useState('');
-    const [collections, setCollections] = useState([]); // Fetch or manage collections
+
+    useEffect(() => {
+        setSortedFavorites(favorites);
+    }, [favorites]);
 
     const handleSort = (option) => {
         setSortOption(option);
-        // Sort the favorites array based on the option
+        let sorted = [...favorites];
+        
+        switch (option) {
+            case 'a-z':
+                sorted.sort((a, b) => a.Title.localeCompare(b.Title));
+                break;
+            case 'z-a':
+                sorted.sort((a, b) => b.Title.localeCompare(a.Title));
+                break;
+            case 'newest-added':
+                sorted.sort((a, b) => b.addedAt - a.addedAt);
+                break;
+            case 'oldest-added':
+                sorted.sort((a, b) => a.addedAt - b.addedAt);
+                break;
+            case 'oldest':
+                sorted.sort((a, b) => parseInt(a.Year) - parseInt(b.Year));
+                break;
+            case 'newest':
+                sorted.sort((a, b) => parseInt(b.Year) - parseInt(a.Year));
+                break;
+            case 'g-to-r':
+                sorted.sort((a, b) => a.Rated.localeCompare(b.Rated));
+                break;
+            case 'r-to-g':
+                sorted.sort((a, b) => b.Rated.localeCompare(a.Rated));
+                break;
+            default:
+                break;
+        }
+
+        setSortedFavorites(sorted);
     };
 
     const handleSelectMovie = async (imdbID) => {
@@ -20,20 +55,19 @@ function FavoriteMovies({ favorites, setSelectedMovie }) {
             <h2>Favorite Movies</h2>
             <div>
                 <label>Sort by:</label>
-                <select onChange={(e) => handleSort(e.target.value)}>
+                <select onChange={(e) => handleSort(e.target.value)} value={sortOption}>
                     <option value="a-z">A to Z</option>
                     <option value="z-a">Z to A</option>
-                    {/* Add more sorting options */}
-                </select>
-                <label>My Collections: </label>
-                <select>
-                    {collections.map((collection, index) => (
-                        <option key={index} value={collection.name}>{collection.name}</option>
-                    ))}
+                    <option value="newest-added">Newest Added</option>
+                    <option value="oldest-added">Oldest Added</option>
+                    <option value="oldest">Oldest</option>
+                    <option value="newest">Newest</option>
+                    <option value="g-to-r">G to R</option>
+                    <option value="r-to-g">R to G</option>
                 </select>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', marginTop: '20px', width: '100%' }}>
-                {favorites.map(movie => (
+                {sortedFavorites.map(movie => (
                     <div key={movie.imdbID} onClick={() => handleSelectMovie(movie.imdbID)} style={{
                         display: 'flex',
                         flexDirection: 'column',
@@ -65,6 +99,7 @@ function FavoriteMovies({ favorites, setSelectedMovie }) {
 }
 
 export default FavoriteMovies;
+
 
 
 
