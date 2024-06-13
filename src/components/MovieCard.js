@@ -90,7 +90,11 @@ function MovieCard({ movie, addToFavorites, favorites, addToWatchlist, watchlist
             <button onClick={togglePlot} style={{ marginTop: '10px', padding: '5px 10px', cursor: 'pointer' }}>
               {showPlot ? 'Hide Plot' : 'Show Plot'}
             </button>
-            {showPlot && <p style={{ marginTop: '10px' }}>{movie.Plot}</p>}
+            {showPlot && (
+              <div style={{ marginTop: '10px', backgroundColor: 'rgba(0, 0, 0, 0.7)', padding: '10px', borderRadius: '10px' }}>
+                <p style={{ color: 'white' }}>{movie.Plot}</p>
+              </div>
+            )}
             <p><strong>Genre:</strong> {movie.Genre ? movie.Genre : 'N/A'}</p>
             <p><strong>Director:</strong> {movie.Director ? movie.Director : 'N/A'}</p>
             <p><strong>Actors:</strong> {movie.Actors ? movie.Actors : 'N/A'}</p>
