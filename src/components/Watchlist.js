@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function Watchlist({ watchlist, setSelectedMovie }) {
     const [sortedWatchlist, setSortedWatchlist] = useState([]);
     const [sortOption, setSortOption] = useState('');
     const [activeTab, setActiveTab] = useState('watchlist');
-    const scrollContentRef = useRef(null);
+    const [isSpinning, setIsSpinning] = useState(false);
+    const [selectedMovieIndex, setSelectedMovieIndex] = useState(null);
 
     useEffect(() => {
         setSortedWatchlist(watchlist);
@@ -13,7 +14,7 @@ function Watchlist({ watchlist, setSelectedMovie }) {
     const handleSort = (option) => {
         setSortOption(option);
         let sorted = [...watchlist];
-
+        
         switch (option) {
             case 'a-z':
                 sorted.sort((a, b) => a.Title.localeCompare(b.Title));
@@ -51,8 +52,15 @@ function Watchlist({ watchlist, setSelectedMovie }) {
     };
 
     const handleRandomPick = () => {
-        const randomMovie = sortedWatchlist[Math.floor(Math.random() * sortedWatchlist.length)];
-        setSelectedMovie(randomMovie);
+        setIsSpinning(true);
+        setSelectedMovieIndex(null);
+        const spinDuration = 4000; // 4 seconds of spinning
+        setTimeout(() => {
+            const randomIndex = Math.floor(Math.random() * sortedWatchlist.length);
+            setSelectedMovieIndex(randomIndex);
+            setSelectedMovie(sortedWatchlist[randomIndex]);
+            setIsSpinning(false);
+        }, spinDuration + 2000); // Total duration includes slow down time
     };
 
     const handleSelectMovie = async (imdbID) => {
@@ -61,33 +69,17 @@ function Watchlist({ watchlist, setSelectedMovie }) {
         setSelectedMovie(data);
     };
 
-    useEffect(() => {
-        const scrollContent = scrollContentRef.current;
-        if (scrollContent) {
-            const handleAnimationIteration = () => {
-                scrollContent.style.animation = 'none';
-                requestAnimationFrame(() => {
-                    scrollContent.style.animation = '';
-                });
-            };
-            scrollContent.addEventListener('animationiteration', handleAnimationIteration);
-            return () => {
-                scrollContent.removeEventListener('animationiteration', handleAnimationIteration);
-            };
-        }
-    }, [sortedWatchlist]);
-
     return (
         <div>
             <div className="tab-container">
-                <button
-                    className={`tab ${activeTab === 'watchlist' ? 'active' : ''}`}
+                <button 
+                    className={`tab ${activeTab === 'watchlist' ? 'active' : ''}`} 
                     onClick={() => handleTabChange('watchlist')}
                 >
                     Watchlist
                 </button>
-                <button
-                    className={`tab ${activeTab === 'random' ? 'active' : ''}`}
+                <button 
+                    className={`tab ${activeTab === 'random' ? 'active' : ''}`} 
                     onClick={() => handleTabChange('random')}
                 >
                     Random Pick!
@@ -133,28 +125,18 @@ function Watchlist({ watchlist, setSelectedMovie }) {
             )}
             {activeTab === 'random' && (
                 <div className="random-container">
-                    <div className="scroll-container">
-                        <div className="scroll-content" ref={scrollContentRef}>
-                            {sortedWatchlist.concat(sortedWatchlist).map((movie, index) => (
-                                <div key={index} className="movie-frame">
+                    <div className={`film-roll ${isSpinning ? 'spin' : ''}`}>
+                        <div className="film-roll-content">
+                            {sortedWatchlist.map((movie, index) => (
+                                <div key={index} className={`film-frame ${index === selectedMovieIndex ? 'selected' : ''}`}>
                                     <img src={movie.Poster} alt={movie.Title} style={{ width: '100px', height: '150px' }} />
-                                    <div className="squares-container top">
-                                        {[...Array(3)].map((_, idx) => (
-                                            <div key={idx} className="square"></div>
-                                        ))}
-                                    </div>
-                                    <div className="squares-container bottom">
-                                        {[...Array(3)].map((_, idx) => (
-                                            <div key={idx} className="square"></div>
-                                        ))}
-                                    </div>
                                 </div>
                             ))}
                         </div>
                     </div>
                     <div className="random-button-container">
-                        <button onClick={handleRandomPick} className="random-button">
-                            Pick a Movie
+                        <button onClick={handleRandomPick} className="random-button" disabled={isSpinning}>
+                            {isSpinning ? 'Spinning...' : 'Pick a Movie'}
                         </button>
                     </div>
                 </div>
@@ -163,7 +145,7 @@ function Watchlist({ watchlist, setSelectedMovie }) {
                 {`
                     .tab-container {
                         display: flex;
-                        justify-content: flex-start; /* Align tabs to the left */
+                        justify-content: center;
                         margin-top: 20px;
                     }
                     .tab {
@@ -186,58 +168,73 @@ function Watchlist({ watchlist, setSelectedMovie }) {
                     .movie-card:hover {
                         transform: scale(1.1); // Scale up on hover
                     }
-                    .scroll-container {
+                    .random-container {
+                        text-align: center;
+                        margin-top: 20px;
+                    }
+                    .film-roll {
+                        display: flex;
                         overflow: hidden;
-                        width: 100%;
+                        white-space: nowrap;
                         background-color: black;
-                        padding: 20px 0;
+                        padding: 10px;
+                        border-radius: 10px;
+                        margin: 20px auto;
+                        width: 80%;
                         position: relative;
                     }
-                    .scroll-content {
+                    .film-roll-content {
                         display: flex;
                         animation: scroll 20s linear infinite;
-                        width: max-content; /* Ensure it adjusts to the content width */
+                    }
+                    .film-roll.spin .film-roll-content {
+                        animation: spin 1s infinite linear;
+                        animation-duration: 1s;
+                        animation-timing-function: ease-in-out;
+                    }
+                    .film-frame {
+                        display: inline-block;
+                        margin: 0 10px;
+                        border: 5px solid #fff;
+                        padding: 5px;
+                        background-color: #000;
+                        border-radius: 5px;
+                        transition: transform 0.3s ease, border-color 0.3s ease;
+                    }
+                    .film-frame.selected {
+                        border-color: gold;
+                        box-shadow: 0 0 20px gold;
+                        animation: glow 1s ease-in-out;
                     }
                     @keyframes scroll {
                         0% {
-                            transform: translateX(0%);
+                            transform: translateX(100%);
                         }
                         100% {
-                            transform: translateX(-50%);
+                            transform: translateX(-100%);
                         }
                     }
-                    .movie-frame {
-                        display: inline-block;
-                        margin: 10px;
-                        padding: 10px;
-                        background-color: black;
-                        border: 2px solid black;
-                        position: relative;
+                    @keyframes spin {
+                        0% {
+                            transform: translateX(0);
+                        }
+                        100% {
+                            transform: translateX(-100%);
+                        }
                     }
-                    .squares-container {
-                        display: flex;
-                        justify-content: space-around;
-                        position: absolute;
-                        width: 100%;
-                    }
-                    .squares-container.top {
-                        top: -12px;
-                    }
-                    .squares-container.bottom {
-                        bottom: -12px;
-                    }
-                    .square {
-                        width: 10px;
-                        height: 10px;
-                        background-color: white;
-                    }
-                    .random-container {
-                        text-align: left; /* Align button to the left */
-                        padding-left: 20px; /* Add padding to separate from the edge */
+                    @keyframes glow {
+                        0% {
+                            border-color: gold;
+                            box-shadow: 0 0 20px gold;
+                        }
+                        100% {
+                            border-color: #fff;
+                            box-shadow: none;
+                        }
                     }
                     .random-button-container {
                         display: flex;
-                        justify-content: flex-start; /* Align button to the left */
+                        justify-content: center;
                         margin-top: 20px;
                     }
                     .random-button {
@@ -251,7 +248,11 @@ function Watchlist({ watchlist, setSelectedMovie }) {
                         cursor: pointer;
                         transition: transform 0.2s;
                     }
-                    .random-button:hover {
+                    .random-button:disabled {
+                        cursor: not-allowed;
+                        opacity: 0.6;
+                    }
+                    .random-button:hover:not(:disabled) {
                         transform: scale(1.1);
                     }
                 `}
@@ -261,6 +262,26 @@ function Watchlist({ watchlist, setSelectedMovie }) {
 }
 
 export default Watchlist;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

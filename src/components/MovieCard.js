@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart as solidHeart, faPlus as solidPlus } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as outlineHeart, faSquare as outlineSquare } from '@fortawesome/free-regular-svg-icons';
 
-function MovieCard({ movie, addToFavorites, favorites, addToWatchlist, watchlist }) {
+function MovieCard({ movie, addToFavorites, favorites, addToWatchlist, watchlist, glow }) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [showPlot, setShowPlot] = useState(false);
 
@@ -21,7 +21,7 @@ function MovieCard({ movie, addToFavorites, favorites, addToWatchlist, watchlist
   const isInWatchlist = watchlist.some(watch => watch.imdbID === movie.imdbID);
 
   return (
-    <div onClick={handleFlip} style={{ width: '400px', height: '600px', perspective: '1000px', cursor: 'pointer' }}>
+    <div onClick={handleFlip} className={`movie-card-container ${glow ? 'glow' : ''}`} style={{ width: '400px', height: '600px', perspective: '1000px', cursor: 'pointer' }}>
       <div style={{
         width: '100%',
         height: '100%',
@@ -106,6 +106,9 @@ function MovieCard({ movie, addToFavorites, favorites, addToWatchlist, watchlist
 }
 
 export default MovieCard;
+
+
+
 
 
 
